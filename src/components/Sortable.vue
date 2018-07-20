@@ -88,7 +88,14 @@ export default {
     },
     methods: {
       shouldIgnore(e) {
+        if (e.oldComponent.group !== this.group) {
+            return true;
+        }
 
+        if (e.oldComponent.value === this.value && e.oldComponent.$el !== this.$el) {
+            return true;
+        }
+        return false;
       },
         isChild(event) {
             const target = event.sensorEvent.target;
@@ -118,14 +125,9 @@ export default {
           const e = event.source._source;
           e.newComponent = this;
 
-          if (e.oldComponent.group !== this.group) {
-              return;
+          if (this.shouldIgnore(e)) {
+            return;
           }
-
-          if (e.oldComponent.value === this.value && e.oldComponent.$el !== this.$el) {
-              return;
-          }
-
 
           const children = this.$draggable.getDraggableElementsForContainer(overContainer);
           move({source, over, overContainer, children});
@@ -133,7 +135,16 @@ export default {
         },
         onDragOutContainer(event) {
           const {source} = event;
-          const overContainer = event.source._source.oldComponent.$el;
+
+
+          const e = event.source._source;
+          e.newComponent = null;
+
+          if (this.shouldIgnore(e)) {
+            return;
+          }
+
+          const overContainer = e.oldComponent.$el;
           const children = this.$draggable.getDraggableElementsForContainer(overContainer);
           const over = children[event.source._source.oldIndex];
 
@@ -153,12 +164,8 @@ export default {
           const e = event.source._source;
           e.newComponent = this;
 
-          if (e.oldComponent.group !== this.group) {
-              return;
-          }
-
-          if (e.oldComponent.value === this.value && e.oldComponent.$el !== this.$el) {
-              return;
+          if (this.shouldIgnore(e)) {
+            return;
           }
 
           const {source, over} = event;
@@ -214,9 +221,7 @@ export default {
             if (e.newComponent.value === this.value) {
                 return;
             }
-            const newArray = [...this.value];
-            newArray.splice(e.oldIndex, 1);
-            this.$emit('input', newArray);
+            this.$emit('input', this.value.filter(item => item !== e.item));
             this.$emit('remove', e.item);
         }
     },

@@ -1,8 +1,8 @@
 <template>
   <div class="hello">
-     <droppable>
-       <div class="dropzone">
-         Drop item here
+     <droppable @drop="handleDrop">
+       <div slot-scope="scope" class="dropzone" :class="scope">
+         Drop item here {{ message }}
        </div>
      </droppable>
      Group 1 (items): {{ items }}
@@ -67,6 +67,7 @@ export default {
   name: 'HelloWorld',
   data() {
     return {
+      message: '',
       items: [{
         id: 1,
         name: 'One'
@@ -99,8 +100,15 @@ export default {
   props: {
     msg: String
   },
-  mounted() {
+  methods: {
+    handleDrop({ item }) {
+      this.message = item.name;
+      setTimeout(() => {
+        this.message = '';
+      }, 1400)
+      this.items3 = this.items3.filter(x => x !== item);
 
+    }  
   }
 }
 </script>
@@ -131,10 +139,12 @@ li {
      border: 2px solid transparent;
 } 
 .dropzone.active {
-     border-color: blue;
+     background: blue;
+     color: white;
 }
 .dropzone.over {
-     border-color: red;
+     background: red;
+     color: white;
 }
 
 </style>

@@ -43,12 +43,19 @@ export default {
             if (!this.over) {
                 return;
             }
+            this.over = false;
 
             this.$emit('drop', event.source._source);
         }
     },
     render() {
-      return this.$slots.default[0]
+        if (this.$scopedSlots.default) {
+            return this.$scopedSlots.default({
+                over: this.over,
+                active: this.active
+            });
+        }
+        return this.$slots.default[0]
     }
 }
 </script>
