@@ -124,7 +124,9 @@ export default {
             const {source, over} = event;
             const overContainer = this.$el;
 
-            if (source.parentNode.getAttribute('data-sortable-group') !== overContainer.getAttribute('data-sortable-group')) {
+            source._source.newComponent = this;
+
+            if (source._source.component.group !== this.group) {
                 return;
             }
 
@@ -137,26 +139,33 @@ export default {
 
             const e = event.source._source;
 
-            if (
-                newContainer === this.$el || e.component === this
-            ) {
-                const sameContainer = e.component.$el === newContainer;
-                if (sameContainer) {
-                    this.$emit('input', moveArray(this.value, e.startIndex, newIndex));
-                } else if  (newContainer === this.$el) {
-                    // if new container is me, add
-                    const newArray = [...this.value];
-                    newArray.splice(newIndex, 0, e.component.value[e.startIndex]);
-                    this.$emit('input', newArray);
-                    this.$emit('receive', e.component.value[e.startIndex]);
-                } else if (e.component === this) {
-                    const newArray = [...this.value];
-                    const removed = newArray.splice(e.startIndex, 1);
-                    this.$emit('input', newArray);
-                    this.$emit('remove', removed[0]);
-                } 
-           }
+            const belongToSameGroup = this.group === e.component.group && e.component.group === e.newComponent.group
 
+            if (!belongToSameGroup) {
+                return;
+            }
+
+            const sendingOrReceivingElement = newContainer === this.$el || e.component === this;
+
+            if (!sendingOrReceivingElement) {
+                return;
+            }
+
+            const sameContainer = e.component.$el === newContainer;
+            if (sameContainer) {
+                this.$emit('input', moveArray(this.value, e.startIndex, newIndex));
+            } else if  (newContainer === this.$el) {
+                // if new container is me, add
+                const newArray = [...this.value];
+                newArray.splice(newIndex, 0, e.component.value[e.startIndex]);
+                this.$emit('input', newArray);
+                this.$emit('receive', e.component.value[e.startIndex]);
+            } else if (e.component === this) {
+                const newArray = [...this.value];
+                const removed = newArray.splice(e.startIndex, 1);
+                this.$emit('input', newArray);
+                this.$emit('remove', removed[0]);
+            } 
         }
     },
     render() {

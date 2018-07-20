@@ -19,7 +19,7 @@
         </sortable-item>
       </ul>
    </sortable>
-<!--    <sortable group="list2" v-model="items2">
+   <sortable group="list2" v-model="items3">
       <ul slot-scope="{ items }">
         <sortable-item v-for="item in items" :key="item.id">
           <li>
@@ -27,7 +27,7 @@
           </li>
         </sortable-item>
       </ul>
-   </sortable> -->
+   </sortable>
   </div>
 </template>
 
@@ -53,6 +53,13 @@ export default {
       }, {
         id: 4,
         name: 'Four'
+      }],
+      items3: [{
+        id: 5,
+        name: 'Five' 
+      }, {
+        id: 6,
+        name: 'Six'
       }]
     }
   },

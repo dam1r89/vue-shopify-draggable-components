@@ -43,6 +43,7 @@ export default {
             const target = event.sensorEvent.target;
             if (target === this.$el || this.$el.contains(target)) {
                 if (this.over === false) {
+                    event.source._source.newComponent = this;
                     this.$emit('enter');
                 }
                 this.over = true; 

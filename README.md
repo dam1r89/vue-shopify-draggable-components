@@ -19,3 +19,7 @@ npm run build
 ```
 npm run lint
 ```
+## TODO:
+
+[+] Handle drop on dropzone
+[ ] try injecting provider
