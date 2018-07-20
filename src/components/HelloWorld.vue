@@ -1,11 +1,11 @@
 <template>
   <div class="hello">
     <div>
-       <droppable>
+<!--        <droppable>
          <div class="dropzone">
            Drop item here
          </div>
-       </droppable>
+       </droppable> -->
        Group 1 (items)
        <sortable group="list" v-model="items">
           <ul slot-scope="{ items }">
@@ -31,7 +31,7 @@
           </ul>
        </sortable>
 
-       Group 2 (items3)
+   <!--     Group 2 (items3)
        <sortable group="list2" v-model="items3">
           <ul slot-scope="{ items }">
             <sortable-item v-for="item in items" :key="item.id">
@@ -54,7 +54,7 @@
               </drag-handle>
             </sortable-item>
           </ul>
-       </sortable>
+       </sortable> -->
     </div>
     <div>
       <p>
@@ -80,14 +80,14 @@ export default {
   name: 'HelloWorld',
   data() {
     return {
-      items: [{
+      items: [] ,
+      items2: [{
         id: 1,
         name: 'One'
       }, {
         id: 2,
         name: 'Two'
-      }] ,
-      items2: [{
+      }, {
         id: 3,
         name: 'Three' 
       }, {
@@ -129,6 +129,7 @@ export default {
 }
 ul {
   list-style-type: none;
+  min-height: 60px
 }
 li {
   text-align: center;

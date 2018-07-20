@@ -31,6 +31,7 @@ export default {
             }
             else {
                 if (this.over === true) {
+                    event.source._source.newComponent = null;
                     this.$emit('leave');
                 }
                 this.over = false;

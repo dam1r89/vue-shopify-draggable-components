@@ -91,15 +91,15 @@ export default {
           return this.$draggable.getDraggableElementsForContainer(element.parentNode).indexOf(element);
         },
         onDragStart(event) {
-
-            if (this.isChild(event)) {
-                const oldIndex =  this.index(event.source);
-                event.source._source = {
-                    oldComponent: this,
-                    oldIndex,
-                    item: this.value[oldIndex]
-                }
-            }
+          if (!this.isChild(event)) {
+            return;
+          }
+          const oldIndex =  this.index(event.source);
+          event.source._source = {
+              oldComponent: this,
+              oldIndex,
+              item: this.value[oldIndex]
+          }
             
         },
         onDragOver(event) {
@@ -132,7 +132,7 @@ export default {
         onDragStop(event) {
             const e = event.source._source;
 
-            const belongToSameGroup = this.group === e.oldComponent.group && e.oldComponent.group === e.newComponent.group
+            const belongToSameGroup = e.newComponent && this.group === e.oldComponent.group && e.oldComponent.group === e.newComponent.group
 
             if (!belongToSameGroup) {
                 return;
