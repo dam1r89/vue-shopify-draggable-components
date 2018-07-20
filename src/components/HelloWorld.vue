@@ -1,72 +1,59 @@
 <template>
   <div class="hello">
-    <div>
-<!--        <droppable>
-         <div class="dropzone">
-           Drop item here
-         </div>
-       </droppable> -->
-       Group 1 (items)
-       <sortable group="list" v-model="items">
-          <ul slot-scope="{ items }">
-            <sortable-item v-for="item in items" :key="item.id">
-              <drag-handle>
-                <li>
-                  {{ item.name }}
-                </li>
-              </drag-handle>
-            </sortable-item>
-          </ul>
-       </sortable>
-       Group 1 (items2)
-       <sortable group="list" v-model="items2">
-          <ul slot-scope="{ items }">
-            <sortable-item v-for="item in items" :key="item.id">
-              <drag-handle>
-                <li>
-                  {{ item.name }}
-                </li>
-              </drag-handle>
-            </sortable-item>
-          </ul>
-       </sortable>
+     <droppable>
+       <div class="dropzone">
+         Drop item here
+       </div>
+     </droppable>
+     Group 1 (items): {{ items }}
+     <sortable group="list" v-model="items">
+        <ul slot-scope="{ items }">
+          <sortable-item v-for="item in items" :key="item.id">
+            <drag-handle>
+              <li>
+                {{ item.name }}
+              </li>
+            </drag-handle>
+          </sortable-item>
+        </ul>
+     </sortable>
+     Group 1 (items2): {{ items2 }}
+     <sortable group="list" v-model="items2">
+        <ul slot-scope="{ items }">
+          <sortable-item v-for="item in items" :key="item.id">
+            <drag-handle>
+              <li>
+                {{ item.name }}
+              </li>
+            </drag-handle>
+          </sortable-item>
+        </ul>
+     </sortable>
 
-   <!--     Group 2 (items3)
-       <sortable group="list2" v-model="items3">
-          <ul slot-scope="{ items }">
-            <sortable-item v-for="item in items" :key="item.id">
-              <drag-handle>
-                <li>
-                  {{ item.name }}
-                </li>
-              </drag-handle>
-            </sortable-item>
-          </ul>
-       </sortable>
-       Group 2 (copy, items3)
-       <sortable group="list2" v-model="items3">
-          <ul slot-scope="{ items }">
-            <sortable-item v-for="item in items" :key="item.id">
-              <drag-handle>
-                <li>
-                  {{ item.name }}
-                </li>
-              </drag-handle>
-            </sortable-item>
-          </ul>
-       </sortable> -->
-    </div>
-    <div>
-      <p>
-        items: {{ items }}
-      </p>
-      <p>
-        items2: {{ items2 }}
-      </p>
-      <p>
-        items3: {{ items3 }}
-      </p>
-    </div>
+     Group 2 (items3): {{ items3 }}
+     <sortable group="list2" v-model="items3">
+        <ul slot-scope="{ items }">
+          <sortable-item v-for="item in items" :key="item.id">
+            <drag-handle>
+              <li>
+                {{ item.name }}
+              </li>
+            </drag-handle>
+          </sortable-item>
+        </ul>
+     </sortable>
+     Group 2 (copy, items3): {{ items3 }}
+     <sortable group="list2" v-model="items3">
+        <ul slot-scope="{ items }">
+          <sortable-item v-for="item in items" :key="item.id">
+            <drag-handle>
+              <li>
+                {{ item.name }}
+              </li>
+            </drag-handle>
+          </sortable-item>
+        </ul>
+     </sortable>
   </div>
 </template>
 
@@ -80,14 +67,14 @@ export default {
   name: 'HelloWorld',
   data() {
     return {
-      items: [] ,
-      items2: [{
+      items: [{
         id: 1,
         name: 'One'
       }, {
         id: 2,
         name: 'Two'
-      }, {
+      }] ,
+      items2: [{
         id: 3,
         name: 'Three' 
       }, {
@@ -125,7 +112,6 @@ export default {
 }
 .hello {
   text-align: left;
-  display: flex;
 }
 ul {
   list-style-type: none;

@@ -73,16 +73,23 @@ function moveArray(items, oldIndex, newIndex) {
 export default {
     props: ['value', 'group'],
     mounted() {
+      this.$draggable.addContainer(this.$el);
       this.$draggable.on('drag:start', this.onDragStart)
+        .on('drag:over:container', this.onDragOverContainer)
+        .on('drag:out:container', this.onDragOutContainer)
           .on('drag:over', this.onDragOver)
           .on('drag:stop', this.onDragStop)
     },
     destroyed() {
+      this.$draggable.removeContainer(this.$el);
       this.$draggable.off('drag:start', this.onDragStart)
           .off('drag:over', this.onDragOver)
           .off('drag:stop', this.onDragStop)
     },
     methods: {
+      shouldIgnore(e) {
+
+      },
         isChild(event) {
             const target = event.sensorEvent.target;
             return target === this.$el || this.$el.contains(target)
@@ -102,37 +109,68 @@ export default {
           }
             
         },
-        onDragOver(event) {
-            if (event.over === event.originalSource || event.over === event.source) {
+        onDragOverContainer(event) {
+          const {source, over, overContainer} = event;
+          if (overContainer !== this.$el){
+            return;
+          }
+
+          const e = event.source._source;
+          e.newComponent = this;
+
+          if (e.oldComponent.group !== this.group) {
               return;
-            }
+          }
 
-            if (!this.isChild(event)) {
-                return;
-            }
-
-            const e = event.source._source;
-            e.newComponent = this;
-
-            if (e.oldComponent.group !== this.group) {
-                return;
-            }
-
-            if (e.oldComponent.value === this.value && e.oldComponent.$el !== this.$el) {
-                return;
-            }
-
-            const {source, over} = event;
-            const overContainer = this.$el;
+          if (e.oldComponent.value === this.value && e.oldComponent.$el !== this.$el) {
+              return;
+          }
 
 
-            const children = this.$draggable.getDraggableElementsForContainer(overContainer);
-            move({source, over, overContainer, children});
+          const children = this.$draggable.getDraggableElementsForContainer(overContainer);
+          move({source, over, overContainer, children});
+
+        },
+        onDragOutContainer(event) {
+          const {source} = event;
+          const overContainer = event.source._source.oldComponent.$el;
+          const children = this.$draggable.getDraggableElementsForContainer(overContainer);
+          const over = children[event.source._source.oldIndex];
+
+           move({source, over, overContainer, children});
+ 
+        },
+        onDragOver(event) {
+          
+          if (event.over === event.originalSource || event.over === event.source) {
+            return;
+          }
+
+          if (!this.isChild(event)) {
+              return;
+          }
+
+          const e = event.source._source;
+          e.newComponent = this;
+
+          if (e.oldComponent.group !== this.group) {
+              return;
+          }
+
+          if (e.oldComponent.value === this.value && e.oldComponent.$el !== this.$el) {
+              return;
+          }
+
+          const {source, over} = event;
+          const overContainer = this.$el;
+
+          const children = this.$draggable.getDraggableElementsForContainer(overContainer);
+          move({source, over, overContainer, children});
         },
         onDragStop(event) {
             const e = event.source._source;
 
-            const belongToSameGroup = e.newComponent && this.group === e.oldComponent.group && e.oldComponent.group === e.newComponent.group
+            const belongToSameGroup = e.newComponent && this.group === e.oldComponent.group && e.oldComponent.group === e.newComponent.group;
 
             if (!belongToSameGroup) {
                 return;
@@ -144,7 +182,7 @@ export default {
                 return;
             }
 
-            const sameBinding  = e.newComponent.$el !== this.$el && e.newComponent.value === this.value;
+            const sameBinding = e.newComponent !== this && e.newComponent.value === this.value;
             if (sameBinding) {
                 return;
             }
@@ -153,14 +191,14 @@ export default {
 
             const sameContainer = e.oldComponent === e.newComponent;
             if (sameContainer) {
-                this.onSortItem(e);
+                this.onSortItems(e);
             } else if  (e.newComponent === this) {
                 this.onReceiveItem(e);
             } else if (e.oldComponent === this) {
                 this.onRemoveItem(e);
             } 
         },
-        onSortItem(e) {
+        onSortItems(e) {
             this.$emit('input', moveArray(this.value, e.oldIndex, e.newIndex));
         },
         onReceiveItem(e) {
