@@ -21,5 +21,6 @@ npm run lint
 ```
 ## TODO:
 
-[+] Handle drop on dropzone
-[ ] try injecting provider
+- [x] Handle drop on dropzone
+- [x] try injecting provider
+- [ ] Create vue plugin

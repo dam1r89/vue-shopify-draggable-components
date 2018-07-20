@@ -24,14 +24,14 @@ export default {
             active: false
         }
     },
+    inject: ['draggable'],
     mounted() {
-        // draggable.addContainer(this.$el);
-      this.$draggable.on('drag:start', this.onDragStart)
+      this.draggable.on('drag:start', this.onDragStart)
         .on('drag:move', this.onDragMove)
         .on('drag:stop', this.onDragStop);
     },
     destroyed() {
-      this.$draggable.off('drag:start', this.onDragStart)
+      this.draggable.off('drag:start', this.onDragStart)
         .off('drag:move', this.onDragMove)
         .off('drag:stop', this.onDragStop);
     },
@@ -56,13 +56,13 @@ export default {
             }
 
         },
-        onDragStop() {
+        onDragStop(event) {
             this.active = false;
             if (!this.over) {
                 return;
             }
-            this.$emit('drop');
-            console.log('dropped');
+
+            this.$emit('drop', event.source._source);
         }
     }
 }

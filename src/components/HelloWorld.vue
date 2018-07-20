@@ -1,33 +1,60 @@
 <template>
   <div class="hello">
-   <droppable></droppable>
-   <sortable group="list" v-model="items">
-      <ul slot-scope="{ items }">
-        <sortable-item v-for="item in items" :key="item.id">
-          <li>
-            {{ item.name }}
-          </li>
-        </sortable-item>
-      </ul>
-   </sortable>
-   <sortable group="list" v-model="items2">
-      <ul slot-scope="{ items }">
-        <sortable-item v-for="item in items" :key="item.id">
-          <li>
-            {{ item.name }}
-          </li>
-        </sortable-item>
-      </ul>
-   </sortable>
-   <sortable group="list2" v-model="items3">
-      <ul slot-scope="{ items }">
-        <sortable-item v-for="item in items" :key="item.id">
-          <li>
-            {{ item.name }}
-          </li>
-        </sortable-item>
-      </ul>
-   </sortable>
+    <div>
+       <droppable></droppable>
+       Group 1 (items)
+       <sortable group="list" v-model="items">
+          <ul slot-scope="{ items }">
+            <sortable-item v-for="item in items" :key="item.id">
+              <li>
+                {{ item.name }}
+              </li>
+            </sortable-item>
+          </ul>
+       </sortable>
+       Group 1 (items2)
+       <sortable group="list" v-model="items2">
+          <ul slot-scope="{ items }">
+            <sortable-item v-for="item in items" :key="item.id">
+              <li>
+                {{ item.name }}
+              </li>
+            </sortable-item>
+          </ul>
+       </sortable>
+
+       Group 2 (items3)
+       <sortable group="list2" v-model="items3">
+          <ul slot-scope="{ items }">
+            <sortable-item v-for="item in items" :key="item.id">
+              <li>
+                {{ item.name }}
+              </li>
+            </sortable-item>
+          </ul>
+       </sortable>
+       Group 2 (copy, items3)
+       <sortable group="list2" v-model="items3">
+          <ul slot-scope="{ items }">
+            <sortable-item v-for="item in items" :key="item.id">
+              <li>
+                {{ item.name }}
+              </li>
+            </sortable-item>
+          </ul>
+       </sortable>
+    </div>
+    <div>
+      <p>
+        items: {{ items }}
+      </p>
+      <p>
+        items2: {{ items2 }}
+      </p>
+      <p>
+        items3: {{ items3 }}
+      </p>
+    </div>
   </div>
 </template>
 
@@ -79,10 +106,15 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style>
+.hello {
+  text-align: left;
+  display: flex;
+}
 ul {
   list-style-type: none;
 }
 li {
+  text-align: center;
   margin-bottom: 4px;
   background: #eee;
   border: 1px solid #777;

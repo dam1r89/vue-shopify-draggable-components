@@ -72,12 +72,7 @@ function moveArray(items, oldIndex, newIndex) {
 
 export default {
     props: ['value', 'group'],
-    data() {
-        return {
-            // startContainer: null,
-            // startIndex: null
-        }
-    },
+    inject: ['draggable'],
     provide() {
       return {
         itemClass: 'draggable-item',
@@ -85,12 +80,12 @@ export default {
       }
     },
     mounted() {
-      this.$draggable.on('drag:start', this.onDragStart)
+      this.draggable.on('drag:start', this.onDragStart)
           .on('drag:over', this.onDragOver)
           .on('drag:stop', this.onDragStop)
     },
     destroyed() {
-      this.$draggable.off('drag:start', this.onDragStart)
+      this.draggable.off('drag:start', this.onDragStart)
           .off('drag:over', this.onDragOver)
           .off('drag:stop', this.onDragStop)
     },
@@ -100,14 +95,16 @@ export default {
             return target === this.$el || this.$el.contains(target)
         },
         index(element) {
-          return this.$draggable.getDraggableElementsForContainer(element.parentNode).indexOf(element);
+          return this.draggable.getDraggableElementsForContainer(element.parentNode).indexOf(element);
         },
         onDragStart(event) {
 
             if (this.isChild(event)) {
+                const startIndex =  this.index(event.source);
                 event.source._source = {
                     component: this,
-                    startIndex: this.index(event.source)
+                    startIndex,
+                    item: this.value[startIndex]
                 }
             }
             
@@ -130,7 +127,7 @@ export default {
                 return;
             }
 
-            const children = this.$draggable.getDraggableElementsForContainer(overContainer);
+            const children = this.draggable.getDraggableElementsForContainer(overContainer);
             move({source, over, overContainer, children});
         },
         onDragStop(event) {
@@ -157,9 +154,9 @@ export default {
             } else if  (newContainer === this.$el) {
                 // if new container is me, add
                 const newArray = [...this.value];
-                newArray.splice(newIndex, 0, e.component.value[e.startIndex]);
+                newArray.splice(newIndex, 0, e.item);
                 this.$emit('input', newArray);
-                this.$emit('receive', e.component.value[e.startIndex]);
+                this.$emit('receive', e.item);
             } else if (e.component === this) {
                 const newArray = [...this.value];
                 const removed = newArray.splice(e.startIndex, 1);
@@ -173,11 +170,5 @@ export default {
         items: this.value,
       })
     }
-}
-function pp(value) {
-    if (value === undefined) {
-        return '"undefined"';
-    }
-    return JSON.parse(JSON.stringify(value));
 }
 </script>
