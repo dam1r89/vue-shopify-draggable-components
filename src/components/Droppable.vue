@@ -1,21 +1,3 @@
-<template>
-    <div class="dropzone" :class="{ active, over }">
-        Dropzone
-    </div>
-</template>
-<style>
-   .dropzone {
-        background: tomato;
-        border: 2px solid transparent;
-   } 
-   .dropzone.active {
-        border-color: blue;
-   }
-   .dropzone.over {
-        border-color: red;
-   }
-
-</style>
 <script>
 export default {
     data() {
@@ -24,14 +6,13 @@ export default {
             active: false
         }
     },
-    inject: ['draggable'],
     mounted() {
-      this.draggable.on('drag:start', this.onDragStart)
+      this.$draggable.on('drag:start', this.onDragStart)
         .on('drag:move', this.onDragMove)
         .on('drag:stop', this.onDragStop);
     },
     destroyed() {
-      this.draggable.off('drag:start', this.onDragStart)
+      this.$draggable.off('drag:start', this.onDragStart)
         .off('drag:move', this.onDragMove)
         .off('drag:stop', this.onDragStop);
     },
@@ -64,6 +45,9 @@ export default {
 
             this.$emit('drop', event.source._source);
         }
+    },
+    render() {
+      return this.$slots.default[0]
     }
 }
 </script>

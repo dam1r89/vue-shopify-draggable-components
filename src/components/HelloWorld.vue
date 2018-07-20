@@ -1,14 +1,20 @@
 <template>
   <div class="hello">
     <div>
-       <droppable></droppable>
+       <droppable>
+         <div class="dropzone">
+           Drop item here
+         </div>
+       </droppable>
        Group 1 (items)
        <sortable group="list" v-model="items">
           <ul slot-scope="{ items }">
             <sortable-item v-for="item in items" :key="item.id">
-              <li>
-                {{ item.name }}
-              </li>
+              <drag-handle>
+                <li>
+                  {{ item.name }}
+                </li>
+              </drag-handle>
             </sortable-item>
           </ul>
        </sortable>
@@ -16,9 +22,11 @@
        <sortable group="list" v-model="items2">
           <ul slot-scope="{ items }">
             <sortable-item v-for="item in items" :key="item.id">
-              <li>
-                {{ item.name }}
-              </li>
+              <drag-handle>
+                <li>
+                  {{ item.name }}
+                </li>
+              </drag-handle>
             </sortable-item>
           </ul>
        </sortable>
@@ -27,9 +35,11 @@
        <sortable group="list2" v-model="items3">
           <ul slot-scope="{ items }">
             <sortable-item v-for="item in items" :key="item.id">
-              <li>
-                {{ item.name }}
-              </li>
+              <drag-handle>
+                <li>
+                  {{ item.name }}
+                </li>
+              </drag-handle>
             </sortable-item>
           </ul>
        </sortable>
@@ -37,9 +47,11 @@
        <sortable group="list2" v-model="items3">
           <ul slot-scope="{ items }">
             <sortable-item v-for="item in items" :key="item.id">
-              <li>
-                {{ item.name }}
-              </li>
+              <drag-handle>
+                <li>
+                  {{ item.name }}
+                </li>
+              </drag-handle>
             </sortable-item>
           </ul>
        </sortable>
@@ -62,6 +74,7 @@
 import Droppable from './Droppable.vue';
 import Sortable from './Sortable.vue';
 import SortableItem from './SortableItem.vue';
+import DragHandle from './DragHandle.vue';
 
 export default {
   name: 'HelloWorld',
@@ -93,7 +106,8 @@ export default {
   components: {
     Droppable,
     Sortable,
-    SortableItem
+    SortableItem,
+    DragHandle
   },
   props: {
     msg: String
@@ -106,6 +120,9 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style>
+.drag-handle {
+  cursor: pointer;
+}
 .hello {
   text-align: left;
   display: flex;
@@ -122,4 +139,15 @@ li {
   padding: 8px;
   width: 300px;
 }
+.dropzone {
+     background: tomato;
+     border: 2px solid transparent;
+} 
+.dropzone.active {
+     border-color: blue;
+}
+.dropzone.over {
+     border-color: red;
+}
+
 </style>

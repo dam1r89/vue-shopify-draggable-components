@@ -72,20 +72,13 @@ function moveArray(items, oldIndex, newIndex) {
 
 export default {
     props: ['value', 'group'],
-    inject: ['draggable'],
-    provide() {
-      return {
-        itemClass: 'draggable-item',
-        handleClass: 'draggable-handle',
-      }
-    },
     mounted() {
-      this.draggable.on('drag:start', this.onDragStart)
+      this.$draggable.on('drag:start', this.onDragStart)
           .on('drag:over', this.onDragOver)
           .on('drag:stop', this.onDragStop)
     },
     destroyed() {
-      this.draggable.off('drag:start', this.onDragStart)
+      this.$draggable.off('drag:start', this.onDragStart)
           .off('drag:over', this.onDragOver)
           .off('drag:stop', this.onDragStop)
     },
@@ -95,16 +88,16 @@ export default {
             return target === this.$el || this.$el.contains(target)
         },
         index(element) {
-          return this.draggable.getDraggableElementsForContainer(element.parentNode).indexOf(element);
+          return this.$draggable.getDraggableElementsForContainer(element.parentNode).indexOf(element);
         },
         onDragStart(event) {
 
             if (this.isChild(event)) {
-                const startIndex =  this.index(event.source);
+                const oldIndex =  this.index(event.source);
                 event.source._source = {
-                    component: this,
-                    startIndex,
-                    item: this.value[startIndex]
+                    oldComponent: this,
+                    oldIndex,
+                    item: this.value[oldIndex]
                 }
             }
             
@@ -118,51 +111,75 @@ export default {
                 return;
             }
 
-            const {source, over} = event;
-            const overContainer = this.$el;
+            const e = event.source._source;
+            e.newComponent = this;
 
-            source._source.newComponent = this;
-
-            if (source._source.component.group !== this.group) {
+            if (e.oldComponent.group !== this.group) {
                 return;
             }
 
-            const children = this.draggable.getDraggableElementsForContainer(overContainer);
+            if (e.oldComponent.value === this.value && e.oldComponent.$el !== this.$el) {
+                return;
+            }
+
+            const {source, over} = event;
+            const overContainer = this.$el;
+
+
+            const children = this.$draggable.getDraggableElementsForContainer(overContainer);
             move({source, over, overContainer, children});
         },
         onDragStop(event) {
-            const newIndex = this.index(event.source);
-            const newContainer = event.source.parentNode;
-
             const e = event.source._source;
 
-            const belongToSameGroup = this.group === e.component.group && e.component.group === e.newComponent.group
+            const belongToSameGroup = this.group === e.oldComponent.group && e.oldComponent.group === e.newComponent.group
 
             if (!belongToSameGroup) {
                 return;
             }
 
-            const sendingOrReceivingElement = newContainer === this.$el || e.component === this;
+            const sendingOrReceivingElement = e.newComponent === this || e.oldComponent === this;
 
             if (!sendingOrReceivingElement) {
                 return;
             }
 
-            const sameContainer = e.component.$el === newContainer;
+            const sameBinding  = e.newComponent.$el !== this.$el && e.newComponent.value === this.value;
+            if (sameBinding) {
+                return;
+            }
+
+            e.newIndex = this.index(event.source); 
+
+            const sameContainer = e.oldComponent === e.newComponent;
             if (sameContainer) {
-                this.$emit('input', moveArray(this.value, e.startIndex, newIndex));
-            } else if  (newContainer === this.$el) {
-                // if new container is me, add
-                const newArray = [...this.value];
-                newArray.splice(newIndex, 0, e.item);
-                this.$emit('input', newArray);
-                this.$emit('receive', e.item);
-            } else if (e.component === this) {
-                const newArray = [...this.value];
-                const removed = newArray.splice(e.startIndex, 1);
-                this.$emit('input', newArray);
-                this.$emit('remove', removed[0]);
+                this.onSortItem(e);
+            } else if  (e.newComponent === this) {
+                this.onReceiveItem(e);
+            } else if (e.oldComponent === this) {
+                this.onRemoveItem(e);
             } 
+        },
+        onSortItem(e) {
+            this.$emit('input', moveArray(this.value, e.oldIndex, e.newIndex));
+        },
+        onReceiveItem(e) {
+            if (e.oldComponent.value === this.value) {
+                return;
+            }
+            const newArray = [...this.value];
+            newArray.splice(e.newIndex, 0, e.item);
+            this.$emit('input', newArray);
+            this.$emit('receive', e.item);
+        },
+        onRemoveItem(e) {
+            if (e.newComponent.value === this.value) {
+                return;
+            }
+            const newArray = [...this.value];
+            newArray.splice(e.oldIndex, 1);
+            this.$emit('input', newArray);
+            this.$emit('remove', e.item);
         }
     },
     render() {

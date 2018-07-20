@@ -3,18 +3,10 @@ import App from './App.vue'
 
 Vue.config.productionTip = false
 
-import { Draggable } from '@shopify/draggable';
+import ShopifyDraggable from './ShopifyDraggable';
 
-const draggable  = new Draggable([], {
-  draggable: '.draggable-item'
-});  
+Vue.use(ShopifyDraggable);
 
 new Vue({
   render: h => h(App),
-  provide: {
-    draggable
-  },
-  mounted() {
-    draggable.addContainer(this.$el); 
-  }
 }).$mount('#app')

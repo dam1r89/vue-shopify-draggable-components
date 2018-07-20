@@ -4,7 +4,7 @@
       return this.$slots.default[0]
     },
     mounted() {
-      this.$el.classList.add(this.$draggable.options.draggableClass)
+      this.$el.classList.add(this.$draggable.options.dragHandleClass)
     }
   }
 </script>
