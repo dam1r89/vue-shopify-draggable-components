@@ -29,7 +29,7 @@
           </sortable-item>
         </ul>
      </sortable>
-
+  
      Group 2 (items3): {{ items3 }}
      <sortable group="list2" v-model="items3">
         <ul slot-scope="{ items }">

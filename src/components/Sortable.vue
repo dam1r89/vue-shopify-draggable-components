@@ -1,7 +1,3 @@
-
-<style>
-
-</style>
 <script>
 function move({source, over, overContainer, children}) {
   const emptyOverContainer = !children.length;
@@ -114,9 +110,11 @@ export default {
           return this.$draggable.getDraggableElementsForContainer(element.parentNode).indexOf(element);
         },
         onDragStart(event) {
-          if (!this.isChild(event)) {
+          if (event.sourceContainer !== this.$el) {
             return;
           }
+          console.log(`setting source`, JSON.stringify(this.value), this.$el);
+          
           const oldIndex =  this.index(event.source);
           event.source._source = {
               oldComponent: this,
