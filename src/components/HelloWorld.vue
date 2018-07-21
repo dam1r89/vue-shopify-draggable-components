@@ -58,10 +58,6 @@
 </template>
 
 <script>
-import Droppable from './Droppable.vue';
-import Sortable from './Sortable.vue';
-import SortableItem from './SortableItem.vue';
-import DragHandle from './DragHandle.vue';
 
 export default {
   name: 'HelloWorld',
@@ -90,12 +86,6 @@ export default {
         name: 'Six'
       }]
     }
-  },
-  components: {
-    Droppable,
-    Sortable,
-    SortableItem,
-    DragHandle
   },
   props: {
     msg: String

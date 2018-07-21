@@ -71,7 +71,16 @@ function moveArray(items, oldIndex, newIndex) {
 }
 
 export default {
-    props: ['value', 'group'],
+    props: {
+      value: {
+        default: () => [],
+        type: Array
+      },
+      group: {
+        type: String,
+        required: true
+      }
+    },
     mounted() {
       this.$draggable.addContainer(this.$el);
       this.$draggable.on('drag:start', this.onDragStart)
@@ -114,7 +123,6 @@ export default {
               oldIndex,
               item: this.value[oldIndex]
           }
-            
         },
         onDragOverContainer(event) {
           const {source, over, overContainer} = event;
