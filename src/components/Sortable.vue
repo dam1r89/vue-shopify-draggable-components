@@ -82,8 +82,8 @@ export default {
       this.$draggable.on('drag:start', this.onDragStart)
         .on('drag:over:container', this.onDragOverContainer)
         .on('drag:out:container', this.onDragOutContainer)
-          .on('drag:over', this.onDragOver)
-          .on('drag:stop', this.onDragStop)
+        .on('drag:over', this.onDragOver)
+        .on('drag:stop', this.onDragStop)
     },
     destroyed() {
       this.$draggable.removeContainer(this.$el);
@@ -102,18 +102,29 @@ export default {
         }
         return false;
       },
-        isChild(event) {
-            const target = event.sensorEvent.target;
-            return target === this.$el || this.$el.contains(target)
-        },
-        index(element) {
-          return this.$draggable.getDraggableElementsForContainer(element.parentNode).indexOf(element);
-        },
+      getDraggableElementsForContainer(container) {
+        return [...container.children].filter((childElement) => {
+          return childElement !== this.$draggable.originalSource && childElement !== this.$draggable.mirror;
+        });
+        return this.$draggable.getDraggableElementsForContainer(container);
+        const allDraggableElements = container.querySelectorAll(this.$draggable.options.draggable);
+        const innerContainers = this.$draggable.containers.filter(c  => container.contains(c) && c !== container)
+
+        return [...allDraggableElements].filter((childElement) => {
+          if (innerContainers.some(c => c.contains(childElement))) {
+            return false;
+          }
+          return childElement !== this.$draggable.originalSource && childElement !== this.$draggable.mirror;
+        });
+      },
+      index(element) {
+        return this.getDraggableElementsForContainer(element.parentNode).indexOf(element);
+      },
         onDragStart(event) {
           if (event.sourceContainer !== this.$el) {
             return;
           }
-          console.log(`setting source`, JSON.stringify(this.value), this.$el);
+          // console.log(`setting source`, JSON.stringify(this.value), this.$el);
           
           const oldIndex =  this.index(event.source);
           event.source._source = {
@@ -123,20 +134,21 @@ export default {
           }
         },
         onDragOverContainer(event) {
-          const {source, over, overContainer} = event;
-          if (overContainer !== this.$el){
-            return;
-          }
+            const {source, over, overContainer} = event;
+            if (overContainer !== this.$el){
+              return;
+            }
 
-          const e = event.source._source;
-          e.newComponent = this;
+            const e = event.source._source;
+            e.newComponent = this;
 
-          if (this.shouldIgnore(e)) {
-            return;
-          }
+            if (this.shouldIgnore(e)) {
+              return;
+            }
 
-          const children = this.$draggable.getDraggableElementsForContainer(overContainer);
-          move({source, over, overContainer, children});
+            const children = this.getDraggableElementsForContainer(overContainer);
+ 
+            move({source, over, overContainer, children});
 
         },
         onDragOutContainer(event) {
@@ -151,34 +163,40 @@ export default {
           }
 
           const overContainer = e.oldComponent.$el;
-          const children = this.$draggable.getDraggableElementsForContainer(overContainer);
+          const children = this.getDraggableElementsForContainer(overContainer);
           const over = children[event.source._source.oldIndex];
 
-           move({source, over, overContainer, children});
+          // console.log('outMove', over)
+          move({source, over, overContainer, children});
  
         },
         onDragOver(event) {
-          
-          if (event.over === event.originalSource || event.over === event.source) {
-            return;
-          }
 
-          if (!this.isChild(event)) {
+            const {source, over, overContainer} = event;
+
+            if (over === event.originalSource || over === source) {
               return;
-          }
+            }
 
-          const e = event.source._source;
-          e.newComponent = this;
+            if (overContainer !== this.$el) {
+                return;
+            }
 
-          if (this.shouldIgnore(e)) {
-            return;
-          }
+            if (![...this.$el.children].find(child => child === over)) {
+              return;
+            }
 
-          const {source, over} = event;
-          const overContainer = this.$el;
+            const e = source._source;
+            e.newComponent = this;
 
-          const children = this.$draggable.getDraggableElementsForContainer(overContainer);
-          move({source, over, overContainer, children});
+            if (this.shouldIgnore(e)) {
+              return;
+            }
+
+            const children = this.getDraggableElementsForContainer(overContainer);
+            // console.log('overMove', over)
+            
+            move({source, over, overContainer, children});
         },
         onDragStop(event) {
             const e = event.source._source;
@@ -232,9 +250,13 @@ export default {
         }
     },
     render() {
-      return this.$scopedSlots.default({
-        items: this.value,
-      })
+
+      if (this.$scopedSlots.default) {
+          return this.$scopedSlots.default({
+              items: this.value,
+          });
+      }
+      return this.$slots.default[0]
     }
 }
 </script>

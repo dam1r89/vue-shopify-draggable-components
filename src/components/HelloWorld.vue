@@ -1,34 +1,84 @@
 <template>
   <div class="hello">
+
+     <sortable group="tabs" v-model="tabs">
+      <ul class="tabs" slot-scope="{ items }">
+        <sortable-item v-for="tab in items" :key="tab">
+          <drag-handle>
+            <li>{{ tab }}</li>
+          </drag-handle>
+        </sortable-item>
+      </ul>
+     </sortable>
+
      <droppable @drop="handleDrop">
        <div slot-scope="scope" class="dropzone" :class="scope">
          Drop item here {{ message }}
        </div>
      </droppable>
-     Group 1 (items): {{ items }}
-     <sortable group="list" v-model="items">
-        <ul slot-scope="{ items }">
-          <sortable-item v-for="item in items" :key="item.id">
+
+
+     <sortable group="groups">
+      <div class="OuterGroup">
+        <sortable-item>
+          <div class="FirstOuterItem">
             <drag-handle>
-              <li>
-                {{ item.name }}
-              </li>
+              <span>
+                  Group 1 (items): {{ items }}
+              </span>
             </drag-handle>
-          </sortable-item>
-        </ul>
-     </sortable>
-     Group 1 (items2): {{ items2 }}
-     <sortable group="list" v-model="items2">
-        <ul slot-scope="{ items }">
-          <sortable-item v-for="item in items" :key="item.id">
+
+            <sortable group="list" v-model="items">
+               <ul slot-scope="{ items }" class="FirstSortable">
+                 <sortable-item v-for="item in items" :key="item.id">
+                   <drag-handle>
+                     <li>
+                       {{ item.name }}
+                     </li>
+                   </drag-handle>
+                 </sortable-item>
+               </ul>
+            </sortable>
+            
+          </div> 
+        </sortable-item>
+        <sortable-item>
+          <div class="SecondOuterItem">
             <drag-handle>
-              <li>
-                {{ item.name }}
-              </li>
+              <span>
+                  Group 1 (items2): {{ items2 }}
+              </span>
             </drag-handle>
-          </sortable-item>
-        </ul>
+            <sortable group="list" v-model="items2">
+               <ul slot-scope="{ items }" class="SecondSortable">
+                 <sortable-item v-for="item in items" :key="item.id">
+                   <drag-handle>
+                     <li>
+                       {{ item.name }}
+                     </li>
+                   </drag-handle>
+                 </sortable-item>
+               </ul>
+            </sortable>
+          </div>
+        </sortable-item>
+      </div>
      </sortable>
+
+
+<!--     <sortable group="list" v-model="items">
+       <ul slot-scope="{ items }">
+         <sortable-item v-for="item in items" :key="item.id">
+           <drag-handle>
+             <li>
+               {{ item.name }}
+             </li>
+           </drag-handle>
+         </sortable-item>
+       </ul>
+    </sortable>
+ -->
+
   
      Group 2 (items3): {{ items3 }}
      <sortable group="list2" v-model="items3">
@@ -54,6 +104,10 @@
           </sortable-item>
         </ul>
      </sortable>
+
+
+
+
   </div>
 </template>
 
@@ -64,6 +118,7 @@ export default {
   data() {
     return {
       message: '',
+      tabs: ['Chrome', 'Firefox', 'Edge'],
       items: [{
         id: 1,
         name: 'One'
@@ -92,6 +147,9 @@ export default {
   },
   methods: {
     handleDrop({ item }) {
+      if (!item) {
+        return;
+      }
       this.message = item.name;
       setTimeout(() => {
         this.message = '';
@@ -105,6 +163,21 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style>
+.draggable-source--is-dragging {
+  opacity: 0.5;
+}
+.tabs > li {
+  display: inline-block;
+  width: 80px;
+  padding: 2px 8px;
+  margin-right: 8px;
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+.tabs {
+  border-bottom: 1px solid #eee;
+  min-height: auto;
+}
 .drag-handle {
   cursor: pointer;
 }
