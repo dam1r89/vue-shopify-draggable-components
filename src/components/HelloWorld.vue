@@ -17,18 +17,22 @@
        </div>
      </dropzone>
 
-
      <sortable group="groups">
       <div class="OuterGroup">
         <sortable-item>
           <div class="FirstOuterItem">
             <drag-handle>
               <span>
-                  Group 1 (items): {{ items }}
+                Group 1 (items): {{ items }}
+                <label>
+                  <input type="checkbox" v-model="preventReceive">
+                  Cannot Receive
+                </label>
               </span>
+
             </drag-handle>
 
-            <sortable group="list" v-model="items">
+            <sortable group="list" v-model="items" :prevent-receive="preventReceive">
                <ul slot-scope="{ items }" class="FirstSortable">
                  <sortable-item v-for="item in items" :key="item.id">
                    <drag-handle>
@@ -47,9 +51,13 @@
             <drag-handle>
               <span>
                   Group 1 (items2): {{ items2 }}
+                  <label>
+                    <input type="checkbox" v-model="preventReceive2">
+                    Cannot Receive
+                  </label>
               </span>
             </drag-handle>
-            <sortable group="list" v-model="items2">
+            <sortable group="list" v-model="items2" :prevent-receive="preventReceive2">
                <ul slot-scope="{ items }" class="SecondSortable">
                  <sortable-item v-for="item in items" :key="item.id">
                    <drag-handle>
@@ -104,10 +112,6 @@
           </sortable-item>
         </ul>
      </sortable>
-
-
-
-
   </div>
 </template>
 
@@ -117,6 +121,8 @@ export default {
   name: 'HelloWorld',
   data() {
     return {
+      preventReceive: false,
+      preventReceive2: false,
       message: '',
       tabs: ['Chrome', 'Firefox', 'Edge'],
       items: [{

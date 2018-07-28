@@ -106,6 +106,10 @@ export default {
             if (e.oldComponent.value === this.value && e.oldComponent.$el !== this.$el) {
                 return true;
             }
+
+            if (this.preventReceive) {
+                return true;
+            }
             return false;
         },
         getDraggableElementsForContainer(container) {
@@ -209,23 +213,23 @@ export default {
                 return;
             }
 
-            const sameBinding = e.newComponent !== this && e.newComponent.value === this.value;
-            if (sameBinding) {
+            if (e.newComponent.preventReceive) {
                 return;
             }
 
             e.newIndex = this.index(event.source);
 
-
             const sameContainer = e.oldComponent === e.newComponent;
             if (sameContainer) {
                 this.onSortItems(e);
             } else if  (e.newComponent === this) {
-                this.onReceiveItem(e);
-                this.$nextTick(() => {
-                    event.originalSource.remove();
-                });
-            } else if (e.oldComponent === this) {
+                const canceled = this.onReceiveItem(e);
+                if (canceled !== false) {
+                    this.$nextTick(() => {
+                        event.originalSource.remove();
+                    });
+                }
+           } else if (e.oldComponent === this) {
                 this.onRemoveItem(e);
             }
         },
@@ -235,7 +239,7 @@ export default {
         },
         onReceiveItem(e) {
             if (e.oldComponent.value === this.value) {
-                return;
+                return false;
             }
             const newItems = [...this.value];
             newItems.splice(e.newIndex, 0, e.item);
