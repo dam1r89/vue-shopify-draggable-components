@@ -1,20 +1,21 @@
 <script>
 export default {
+    props: ['data'],
     data() {
         return {
             over: false,
             active: false
-        }
+        };
     },
     mounted() {
-      this.$draggable.on('drag:start', this.onDragStart)
-        .on('drag:move', this.onDragMove)
-        .on('drag:stop', this.onDragStop);
+        this.$draggable.on('drag:start', this.onDragStart)
+            .on('drag:move', this.onDragMove)
+            .on('drag:stop', this.onDragStop);
     },
     destroyed() {
-      this.$draggable.off('drag:start', this.onDragStart)
-        .off('drag:move', this.onDragMove)
-        .off('drag:stop', this.onDragStop);
+        this.$draggable.off('drag:start', this.onDragStart)
+            .off('drag:move', this.onDragMove)
+            .off('drag:stop', this.onDragStop);
     },
     methods: {
         onDragStart() {
@@ -27,7 +28,7 @@ export default {
                     event.source._source.newComponent = this;
                     this.$emit('enter');
                 }
-                this.over = true; 
+                this.over = true;
             }
             else {
                 if (this.over === true) {
@@ -45,7 +46,11 @@ export default {
             }
             this.over = false;
 
-            this.$emit('drop', event.source._source);
+            this.$emit('receive', event.source._source);
+            event.source._source.oldComponent.$emit('drop', {
+                ...event.source._source,
+                data: this.data
+            });
         }
     },
     render() {
@@ -55,7 +60,7 @@ export default {
                 active: this.active
             });
         }
-        return this.$slots.default[0]
+        return this.$slots.default[0];
     }
-}
+};
 </script>

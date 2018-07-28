@@ -1,5 +1,5 @@
 import { Draggable } from '@shopify/draggable';
-import Droppable from './components/Droppable.vue';
+import Dropzone from './components/Dropzone.vue';
 import Sortable from './components/Sortable.vue';
 import SortableItem from './components/SortableItem.vue';
 import DragHandle from './components/DragHandle.vue';
@@ -16,10 +16,13 @@ MyPlugin.install = function(Vue) {
         dragHandleClass,
         draggable: `.${draggableClass}`,
         handle: `.${dragHandleClass}`,
+        mirror: {
+            constrainDimensions: true,
+        },
     });
 
     Vue.component('DragHandle', DragHandle);
-    Vue.component('Droppable', Droppable);
+    Vue.component('Dropzone', Dropzone);
     Vue.component('Sortable', Sortable);
     Vue.component('SortableItem', SortableItem);
 
@@ -29,7 +32,7 @@ MyPlugin.install = function(Vue) {
                 this.$draggable.addContainer(this.$el);
             }
         }
-    })
-}
+    });
+};
 
 export default MyPlugin;

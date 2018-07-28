@@ -1,181 +1,177 @@
 <script>
 function move({source, over, overContainer, children}) {
-  const emptyOverContainer = !children.length;
-  const differentContainer = source.parentNode !== overContainer;
-  const sameContainer = over && !differentContainer;
+    const emptyOverContainer = !children.length;
+    const differentContainer = source.parentNode !== overContainer;
+    const sameContainer = over && !differentContainer;
 
-  if (emptyOverContainer) {
-    return moveInsideEmptyContainer(source, overContainer);
-  } else if (sameContainer) {
-    return moveWithinContainer(source, over);
-  } else if (differentContainer) {
-    return moveOutsideContainer(source, over, overContainer);
-  } else {
-    return null;
-  }
+    if (emptyOverContainer) {
+        return moveInsideEmptyContainer(source, overContainer);
+    } else if (sameContainer) {
+        return moveWithinContainer(source, over);
+    } else if (differentContainer) {
+        return moveOutsideContainer(source, over, overContainer);
+    } else {
+        return null;
+    }
 }
 
 function moveInsideEmptyContainer(source, overContainer) {
-  const oldContainer = source.parentNode;
+    const oldContainer = source.parentNode;
 
-  overContainer.appendChild(source);
+    overContainer.appendChild(source);
 
-  return {oldContainer, newContainer: overContainer};
+    return {oldContainer, newContainer: overContainer};
 }
 
 function moveWithinContainer(source, over) {
-  const oldIndex = index(source);
-  const newIndex = index(over);
+    const oldIndex = index(source);
+    const newIndex = index(over);
 
-  if (oldIndex < newIndex) {
-    source.parentNode.insertBefore(source, over.nextElementSibling);
-  } else {
-    source.parentNode.insertBefore(source, over);
-  }
+    if (oldIndex < newIndex) {
+        source.parentNode.insertBefore(source, over.nextElementSibling);
+    } else {
+        source.parentNode.insertBefore(source, over);
+    }
 
-  return {oldContainer: source.parentNode, newContainer: source.parentNode};
+    return {oldContainer: source.parentNode, newContainer: source.parentNode};
 }
 
 function index(element) {
-  return Array.prototype.indexOf.call(element.parentNode.children, element);
+    return Array.prototype.indexOf.call(element.parentNode.children, element);
 }
 
 function moveOutsideContainer(source, over, overContainer) {
-  const oldContainer = source.parentNode;
+    const oldContainer = source.parentNode;
 
-  if (over) {
-    over.parentNode.insertBefore(source, over);
-  } else {
+    if (over) {
+        over.parentNode.insertBefore(source, over);
+    } else {
     // need to figure out proper position
-    overContainer.appendChild(source);
-  }
+        overContainer.appendChild(source);
+    }
 
-  return {oldContainer, newContainer: source.parentNode};
+    return {oldContainer, newContainer: source.parentNode};
 }
 
 
 function moveArray(items, oldIndex, newIndex) {
-  const itemRemovedArray = [
-    ...items.slice(0, oldIndex),
-    ...items.slice(oldIndex + 1, items.length)
-  ]
-  return [
-    ...itemRemovedArray.slice(0, newIndex),
-    items[oldIndex],
-    ...itemRemovedArray.slice(newIndex, itemRemovedArray.length)
-  ]
+    const itemRemovedArray = [
+        ...items.slice(0, oldIndex),
+        ...items.slice(oldIndex + 1, items.length)
+    ];
+    return [
+        ...itemRemovedArray.slice(0, newIndex),
+        items[oldIndex],
+        ...itemRemovedArray.slice(newIndex, itemRemovedArray.length)
+    ];
 }
 
 export default {
     props: {
-      value: {
-        default: () => [],
-        type: Array
-      },
-      group: {
-        type: String,
-        required: true
-      }
+        value: {
+            default: () => [],
+            type: Array
+        },
+        group: {
+            type: String,
+            default: 'defaultGroup'
+        },
+        preventReceive: {
+            type: Boolean,
+            default: false,
+        }
     },
     mounted() {
-      this.$draggable.addContainer(this.$el);
-      this.$draggable.on('drag:start', this.onDragStart)
-        .on('drag:over:container', this.onDragOverContainer)
-        .on('drag:out:container', this.onDragOutContainer)
-        .on('drag:over', this.onDragOver)
-        .on('drag:stop', this.onDragStop)
+        this.$draggable.addContainer(this.$el);
+        this.$draggable.on('drag:start', this.onDragStart)
+            .on('drag:over:container', this.onDragOverContainer)
+            .on('drag:out:container', this.onDragOutContainer)
+            .on('drag:over', this.onDragOver)
+            .on('drag:stop', this.onDragStop);
     },
     destroyed() {
-      this.$draggable.removeContainer(this.$el);
-      this.$draggable.off('drag:start', this.onDragStart)
-          .off('drag:over', this.onDragOver)
-          .off('drag:stop', this.onDragStop)
+        this.$draggable.removeContainer(this.$el);
+        this.$draggable.off('drag:start', this.onDragStart)
+            .off('drag:over:container', this.onDragOverContainer)
+            .off('drag:out:container', this.onDragOutContainer)
+            .off('drag:over', this.onDragOver)
+            .off('drag:stop', this.onDragStop);
     },
     methods: {
-      shouldIgnore(e) {
-        if (e.oldComponent.group !== this.group) {
-            return true;
-        }
+        shouldIgnore(e) {
+            if (e.oldComponent.group !== this.group) {
+                return true;
+            }
 
-        if (e.oldComponent.value === this.value && e.oldComponent.$el !== this.$el) {
-            return true;
-        }
-        return false;
-      },
-      getDraggableElementsForContainer(container) {
-        return [...container.children].filter((childElement) => {
-          return childElement !== this.$draggable.originalSource && childElement !== this.$draggable.mirror;
-        });
-        return this.$draggable.getDraggableElementsForContainer(container);
-        const allDraggableElements = container.querySelectorAll(this.$draggable.options.draggable);
-        const innerContainers = this.$draggable.containers.filter(c  => container.contains(c) && c !== container)
-
-        return [...allDraggableElements].filter((childElement) => {
-          if (innerContainers.some(c => c.contains(childElement))) {
+            if (e.oldComponent.value === this.value && e.oldComponent.$el !== this.$el) {
+                return true;
+            }
             return false;
-          }
-          return childElement !== this.$draggable.originalSource && childElement !== this.$draggable.mirror;
-        });
-      },
-      index(element) {
-        return this.getDraggableElementsForContainer(element.parentNode).indexOf(element);
-      },
+        },
+        getDraggableElementsForContainer(container) {
+            return [...container.children].filter((childElement) => {
+                return childElement !== this.$draggable.originalSource && childElement !== this.$draggable.mirror;
+            });
+        },
+        index(element) {
+            return this.getDraggableElementsForContainer(element.parentNode).indexOf(element);
+        },
         onDragStart(event) {
-          if (event.sourceContainer !== this.$el) {
-            return;
-          }
-          // console.log(`setting source`, JSON.stringify(this.value), this.$el);
-          
-          const oldIndex =  this.index(event.source);
-          event.source._source = {
-              oldComponent: this,
-              oldIndex,
-              item: this.value[oldIndex]
-          }
+            if (event.sourceContainer !== this.$el) {
+                return;
+            }
+            // console.log(`setting source`, JSON.stringify(this.value), this.$el);
+
+            const oldIndex =  this.index(event.source);
+            event.source._source = {
+                oldComponent: this,
+                oldIndex,
+                item: this.value[oldIndex]
+            };
         },
         onDragOverContainer(event) {
             const {source, over, overContainer} = event;
             if (overContainer !== this.$el){
-              return;
+                return;
             }
 
             const e = event.source._source;
             e.newComponent = this;
 
             if (this.shouldIgnore(e)) {
-              return;
+                return;
             }
 
             const children = this.getDraggableElementsForContainer(overContainer);
- 
+
             move({source, over, overContainer, children});
 
         },
         onDragOutContainer(event) {
-          const {source} = event;
+            const {source} = event;
 
 
-          const e = event.source._source;
-          e.newComponent = null;
+            const e = event.source._source;
+            e.newComponent = null;
 
-          if (this.shouldIgnore(e)) {
-            return;
-          }
+            if (this.shouldIgnore(e)) {
+                return;
+            }
 
-          const overContainer = e.oldComponent.$el;
-          const children = this.getDraggableElementsForContainer(overContainer);
-          const over = children[event.source._source.oldIndex];
+            const overContainer = e.oldComponent.$el;
+            const children = this.getDraggableElementsForContainer(overContainer);
+            const over = children[event.source._source.oldIndex];
 
-          // console.log('outMove', over)
-          move({source, over, overContainer, children});
- 
+            // console.log('outMove', over)
+            move({source, over, overContainer, children});
+
         },
         onDragOver(event) {
 
             const {source, over, overContainer} = event;
 
             if (over === event.originalSource || over === source) {
-              return;
+                return;
             }
 
             if (overContainer !== this.$el) {
@@ -183,19 +179,19 @@ export default {
             }
 
             if (![...this.$el.children].find(child => child === over)) {
-              return;
+                return;
             }
 
             const e = source._source;
             e.newComponent = this;
 
             if (this.shouldIgnore(e)) {
-              return;
+                return;
             }
 
             const children = this.getDraggableElementsForContainer(overContainer);
             // console.log('overMove', over)
-            
+
             move({source, over, overContainer, children});
         },
         onDragStop(event) {
@@ -218,45 +214,51 @@ export default {
                 return;
             }
 
-            e.newIndex = this.index(event.source); 
+            e.newIndex = this.index(event.source);
+
 
             const sameContainer = e.oldComponent === e.newComponent;
             if (sameContainer) {
                 this.onSortItems(e);
             } else if  (e.newComponent === this) {
                 this.onReceiveItem(e);
+                this.$nextTick(() => {
+                    event.originalSource.remove();
+                });
             } else if (e.oldComponent === this) {
                 this.onRemoveItem(e);
-            } 
+            }
         },
         onSortItems(e) {
             this.$emit('input', moveArray(this.value, e.oldIndex, e.newIndex));
+            this.$emit('move', e);
         },
         onReceiveItem(e) {
             if (e.oldComponent.value === this.value) {
                 return;
             }
-            const newArray = [...this.value];
-            newArray.splice(e.newIndex, 0, e.item);
-            this.$emit('input', newArray);
-            this.$emit('receive', e.item);
+            const newItems = [...this.value];
+            newItems.splice(e.newIndex, 0, e.item);
+            this.$emit('input', newItems);
+            this.$emit('receive', {...e, newItems});
         },
         onRemoveItem(e) {
             if (e.newComponent.value === this.value) {
                 return;
             }
-            this.$emit('input', this.value.filter(item => item !== e.item));
-            this.$emit('remove', e.item);
+            const newItems = this.value.filter(item => item !== e.item);
+            this.$emit('input', newItems);
+            this.$emit('remove', {...e, newItems});
         }
     },
     render() {
 
-      if (this.$scopedSlots.default) {
-          return this.$scopedSlots.default({
-              items: this.value,
-          });
-      }
-      return this.$slots.default[0]
+        if (this.$scopedSlots.default) {
+            return this.$scopedSlots.default({
+                items: this.value,
+            });
+        }
+        return this.$slots.default[0];
     }
-}
+};
 </script>

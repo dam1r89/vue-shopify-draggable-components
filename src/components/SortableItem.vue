@@ -1,10 +1,10 @@
 <script>
-  export default {
-    render() {
-      return this.$slots.default[0]
-    },
+export default {
     mounted() {
-      this.$el.classList.add(this.$draggable.options.draggableClass)
-    }
-  }
+        this.$el.classList.add(this.$draggable.options.draggableClass);
+    },
+    render() {
+        return this.$slots.default[0];
+    },
+};
 </script>

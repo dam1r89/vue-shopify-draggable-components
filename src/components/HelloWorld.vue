@@ -11,11 +11,11 @@
       </ul>
      </sortable>
 
-     <droppable @drop="handleDrop">
+     <dropzone @receive="handleDrop">
        <div slot-scope="scope" class="dropzone" :class="scope">
          Drop item here {{ message }}
        </div>
-     </droppable>
+     </dropzone>
 
 
      <sortable group="groups">
